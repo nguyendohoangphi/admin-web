@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Bàn - Coffee Admin</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <span class="material-icons-round">coffee</span>
+                </div>
+                <div class="logo-text">
+                    <h2>COFFEE</h2>
+                    <span>Manager</span>
+                </div>
+            </div>
+
+            <nav class="menu">
+                <div class="menu-section">THỐNG KÊ</div>
+                <a href="/" class="menu-item">
+                    <span class="material-icons-round">analytics</span>
+                    Dashboard
+                </a>
+
+                <div class="menu-section">QUẢN LÝ</div>
+                <a href="/products" class="menu-item">
+                    <span class="material-icons-round">inventory_2</span>
+                    Sản phẩm
+                </a>
+                <a href="/categories" class="menu-item">
+                    <span class="material-icons-round">category</span>
+                    Danh mục
+                </a>
+                <a href="/coupons" class="menu-item">
+                    <span class="material-icons-round">card_giftcard</span>
+                    Mã giảm giá
+                </a>
+                <a href="/tables" class="menu-item active">
+                    <span class="material-icons-round">table_restaurant</span>
+                    Bàn
+                </a>
+                <a href="/orders" class="menu-item">
+                    <span class="material-icons-round">receipt_long</span>
+                    Đơn hàng
+                </a>
+                <a href="/ads" class="menu-item">
+                    <span class="material-icons-round">ad_units</span>
+                    Banners (Ads)
+                </a>
+
+                <div class="menu-section">HỆ THỐNG</div>
+                <a href="/devtools" class="menu-item">
+                    <span class="material-icons-round">code</span>
+                    Developer Tools
+                </a>
+
+                <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid #eee;">
+                    <a href="#" class="menu-item" onclick="logout()" style="color: #ef4444;">
+                        <span class="material-icons-round">logout</span>
+                        Đăng xuất
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-header">
+                <div class="page-title">Quản lý Bàn</div>
+                <div class="user-profile">
+                    <span class="material-icons-round">account_circle</span>
+                    <span>Admin</span>
+                </div>
+            </header>
+
+            <div class="dashboard-content">
+                <div class="action-bar">
+                    <div class="search-box">
+                        <!-- Placeholder for alignment -->
+                    </div>
+                    <button class="btn-primary" id="btn-add-table">
+                        <span class="material-icons-round">add</span> Thêm bàn mới
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Tên Bàn</th>
+                                <th>Trạng Thái</th>
+                                <th>Ngày tạo</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-list">
+                            <!-- JS will populate this -->
+                        </tbody>
+                    </table>
+                    <div id="loading" class="loading">Đang tải dữ liệu...</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Table Modal -->
+    <div id="addTableModal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <h2 style="margin-bottom: 20px;">Thêm bàn mới</h2>
+            <form id="addTableForm">
+                <div class="form-group">
+                    <label>Tên bàn</label>
+                    <input type="text" id="t-name" class="form-control" required placeholder="Ví dụ: Bàn 10">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="btn-close-modal">Hủy</button>
+                    <button type="submit" class="btn-primary">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="theme.js"></script>
+    <script type="module" src="tables.js"></script>
+    <script type="module" src="script.js"></script>
+</body>
+
+</html>

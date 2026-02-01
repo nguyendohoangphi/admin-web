@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Sản phẩm - Coffee Admin</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+
+        <aside class="sidebar">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <span class="material-icons-round">coffee</span>
+                </div>
+                <div class="logo-text">
+                    <h2>COFFEE</h2>
+                    <span>Manager</span>
+                </div>
+            </div>
+
+            <nav class="menu">
+                <div class="menu-section">THỐNG KÊ</div>
+                <a href="/" class="menu-item">
+                    <span class="material-icons-round">analytics</span>
+                    Dashboard
+                </a>
+
+                <div class="menu-section">QUẢN LÝ</div>
+                <a href="/products" class="menu-item active">
+                    <span class="material-icons-round">inventory_2</span>
+                    Sản phẩm
+                </a>
+                <a href="/categories" class="menu-item">
+                    <span class="material-icons-round">category</span>
+                    Danh mục
+                </a>
+                <a href="/coupons" class="menu-item">
+                    <span class="material-icons-round">card_giftcard</span>
+                    Mã giảm giá
+                </a>
+                <a href="/tables" class="menu-item">
+                    <span class="material-icons-round">table_restaurant</span>
+                    Bàn
+                </a>
+                <a href="/orders" class="menu-item">
+                    <span class="material-icons-round">receipt_long</span>
+                    Đơn hàng
+                </a>
+                <a href="/ads" class="menu-item">
+                    <span class="material-icons-round">ad_units</span>
+                    Banners (Ads)
+                </a>
+                <div class="menu-section">HỆ THỐNG</div>
+                <a href="/devtools" class="menu-item">
+                    <span class="material-icons-round">code</span>
+                    Developer Tools
+                </a>
+
+                <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid #eee;">
+                    <a href="#" class="menu-item" onclick="logout()" style="color: #ef4444;">
+                        <span class="material-icons-round">logout</span>
+                        Đăng xuất
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+
+        <main class="main-content">
+            <header class="top-header">
+                <div class="page-title">Quản lý Sản phẩm</div>
+                <div class="user-profile">
+                    <span class="material-icons-round">account_circle</span>
+                    <span>Admin</span>
+                </div>
+            </header>
+
+            <div class="dashboard-content">
+                <div class="action-bar">
+                    <div class="search-box">
+                        <span class="material-icons-round" style="color: #A0AEC0;">search</span>
+                        <input type="text" id="searchInput" placeholder="Tìm kiếm sản phẩm...">
+                    </div>
+                    <button class="btn-primary" id="btn-add-product">
+                        <span class="material-icons-round">add</span> Thêm mới
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Hình ảnh</th>
+                                <th>Tên sản phẩm</th>
+                                <th>Giá</th>
+                                <th>Danh mục</th>
+                                <th>Đánh giá</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="product-list">
+
+                        </tbody>
+                    </table>
+                    <div id="loading" class="loading">Đang tải dữ liệu...</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+
+    <div id="addProductModal" class="modal">
+        <div class="modal-content">
+            <h2 style="margin-bottom: 20px;">Thêm sản phẩm mới</h2>
+            <form id="addProductForm">
+                <div class="form-group">
+                    <label>Tên sản phẩm</label>
+                    <input type="text" id="p-name" class="form-control" required placeholder="Ví dụ: Cà phê sữa">
+                </div>
+                <div class="form-group">
+                    <label>Danh mục</label>
+                    <select id="p-category" class="form-control" required>
+                        <option value="Coffee">Cà phê (Coffee)</option>
+                        <option value="Tea">Trà (Tea)</option>
+                        <option value="Freeze">Đá xay (Freeze)</option>
+                        <option value="Cake">Bánh ngọt (Cake)</option>
+                        <option value="Snack">Ăn vặt (Snack)</option>
+                        <option value="Juice">Nước ép (Juice)</option>
+                        <option value="Cocoa">Sô cô la (Cocoa)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Giá (VND)</label>
+                    <input type="number" id="p-price" class="form-control" required placeholder="50000">
+                </div>
+                <div class="form-group">
+                    <label>Hình ảnh</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="p-image" class="form-control" required
+                            placeholder="assets/images/drink/product/..."
+                            value="assets/images/drink/product/coffee.jpg">
+                        <input type="file" id="p-file" style="display: none;" accept="image/*">
+                        <button type="button" class="btn-secondary" onclick="document.getElementById('p-file').click()"
+                            style="width: auto; white-space: nowrap;">
+                            <span class="material-icons-round">upload</span> Tải lên
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Mô tả</label>
+                    <textarea id="p-desc" class="form-control" rows="3" placeholder="Mô tả sản phẩm..."></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="btn-close-modal">Hủy</button>
+                    <button type="submit" class="btn-primary">Lưu sản phẩm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="theme.js"></script>
+    <script type="module" src="products.js"></script>
+    <script type="module" src="script.js"></script>
+</body>
+
+</html>
