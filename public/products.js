@@ -18,6 +18,60 @@ const imageUrlInput = document.getElementById('p-image');
 
 let isEditMode = false;
 let editId = null;
+// Tags Logic
+let allTags = [];
+
+async function loadTagsForForm() {
+    const tagsContainer = document.getElementById('tags-container');
+    if (!tagsContainer) {
+        console.error("Tags container not found!");
+        return;
+    }
+
+    try {
+        const snap = await getDocs(collection(db, "Tags"));
+        allTags = [];
+        snap.forEach(d => allTags.push(d.data()));
+
+        tagsContainer.innerHTML = '';
+        if (allTags.length === 0) {
+            tagsContainer.innerHTML = '<small style="color:grey;">Chưa có tag nào. Hãy tạo tag trước.</small>';
+            return;
+        }
+
+        allTags.forEach(tag => {
+            const wrapper = document.createElement('label');
+            wrapper.style = "display: flex; align-items: center; gap: 5px; cursor: pointer; background: #f8fafc; padding: 4px 8px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 13px;";
+            wrapper.innerHTML = `
+                <input type="checkbox" name="product-tags" value="${tag.slug}">
+                <span>${tag.name}</span>
+            `;
+            tagsContainer.appendChild(wrapper);
+        });
+
+    } catch (e) {
+        console.error("Tags error:", e);
+        tagsContainer.innerHTML = '<small style="color:red;">Lỗi tải tags</small>';
+    }
+}
+
+// Helper to get selected tags
+function getSelectedTags() {
+    const checkboxes = document.getElementsByName('product-tags');
+    const selected = [];
+    checkboxes.forEach(cb => {
+        if (cb.checked) selected.push(cb.value);
+    });
+    return selected;
+}
+
+// Helper to set selected tags
+function setSelectedTags(tags = []) {
+    const checkboxes = document.getElementsByName('product-tags');
+    checkboxes.forEach(cb => {
+        cb.checked = tags.includes(cb.value);
+    });
+}
 
 
 // Handle file upload
@@ -50,7 +104,9 @@ if (btnAdd) btnAdd.onclick = () => {
     isEditMode = false;
     modalTitle.textContent = "Thêm sản phẩm mới";
     form.reset();
+    setSelectedTags([]); // Clear tags
     modal.style.display = "flex";
+    loadTagsForForm(); // Load tags when opening modal
 };
 if (btnClose) btnClose.onclick = () => { modal.style.display = "none"; };
 window.onclick = (event) => { if (event.target == modal) modal.style.display = "none"; };
@@ -73,6 +129,7 @@ if (form) {
                 description: desc,
                 price: price,
                 type: category,
+                tags: getSelectedTags(), // Save tags
                 createDate: isEditMode ? allProducts.find(p => p.id === editId).createDate : new Date().toISOString()
             };
 
@@ -120,17 +177,25 @@ async function loadProducts() {
         productList.innerHTML = '';
         loading.style.display = 'block';
 
-        const querySnapshot = await getDocs(collection(db, "Products"));
+        // Fetch Products and Tags in parallel
+        const [prodSnap, tagSnap] = await Promise.all([
+            getDocs(collection(db, "Products")),
+            getDocs(collection(db, "Tags"))
+        ]);
+
+        // Process Tags
+        allTags = [];
+        tagSnap.forEach(d => allTags.push(d.data()));
 
         loading.style.display = 'none';
 
-        if (querySnapshot.empty) {
+        if (prodSnap.empty) {
             productList.innerHTML = '<tr><td colspan="6" style="text-align:center">Chưa có sản phẩm nào.</td></tr>';
             return;
         }
 
         allProducts = [];
-        querySnapshot.forEach(doc => {
+        prodSnap.forEach(doc => {
             const data = doc.data();
             allProducts.push({ ...data, id: doc.id });
         });
@@ -161,6 +226,9 @@ function renderTable(products) {
             <td class="text-primary">${price}</td>
             <td><span class="badge">${data.type}</span></td>
             <td>
+                ${(data.tags || []).map(slug => `<span class="badge" style="background:#f1f5f9; color:#475569; margin-right:4px;">${getTagName(slug)}</span>`).join('')}
+            </td>
+            <td>
                 <div class="rating">
                     <span class="material-icons-round start-icon">star</span>
                     ${data.rating ? data.rating.toFixed(1) : 'N/A'} (${data.reviewCount || 0})
@@ -170,7 +238,7 @@ function renderTable(products) {
                 <button class="btn-icon btn-delete" data-id="${data.id}">
                     <span class="material-icons-round">delete</span>
                 </button>
-                <button class="btn-icon btn-edit" onclick="editProduct('${data.id}')">
+                <button class="btn-icon btn-edit" data-id="${data.id}">
                     <span class="material-icons-round">edit</span>
                 </button>
             </td>
@@ -186,10 +254,25 @@ function renderTable(products) {
                 await deleteProduct(id);
             }
         });
+    }); // Close btn-delete loop
+
+    // Bind edit events
+    document.querySelectorAll('.btn-edit').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            editProduct(id);
+        });
     });
 }
 
-window.editProduct = (id) => {
+// Helper to look up tag name
+function getTagName(slug) {
+    const tag = allTags.find(t => t.slug === slug);
+    return tag ? tag.name : slug;
+}
+
+// editProduct is no longer on window
+async function editProduct(id) {
     const product = allProducts.find(p => p.id === id);
     if (!product) return;
 
@@ -202,6 +285,12 @@ window.editProduct = (id) => {
     document.getElementById('p-price').value = product.price;
     document.getElementById('p-image').value = product.imageUrl;
     document.getElementById('p-desc').value = product.description || '';
+
+
+
+    // Load tags first, then select them
+    await loadTagsForForm();
+    setSelectedTags(product.tags || []);
 
     modal.style.display = "flex";
 };

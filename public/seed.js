@@ -37,7 +37,8 @@ export async function seedCategoriesAndProducts() {
                     rating: 4.0 + (Math.random() * 0.9),
                     reviewCount: Math.floor(10 + Math.random() * 90),
                     price: prodData.price,
-                    type: catName
+                    type: catName,
+                    tags: prodData.tags || [] // Added tags support
                 };
 
                 await addDoc(productsRef, newProduct);
@@ -45,7 +46,39 @@ export async function seedCategoriesAndProducts() {
             }
         }
 
-        alert("Nạp dữ liệu thành công!");
+
+        // ==========================================
+        // SEED TAGS COLLECTION (New Logic)
+        // ==========================================
+        console.log("Seeding Tags Collection...");
+        const allTags = new Set();
+
+        // Collect all unique tags
+        seedData.forEach(cat => {
+            cat.products.forEach(prod => {
+                if (prod.tags && Array.isArray(prod.tags)) {
+                    prod.tags.forEach(tag => allTags.add(tag));
+                }
+            });
+        });
+
+        // Add to Firestore
+        const tagsRef = collection(db, "Tags");
+        for (const tagName of allTags) {
+            const q = query(tagsRef, where("name", "==", tagName));
+            const snapshot = await getDocs(q);
+
+            if (snapshot.empty) {
+                await addDoc(tagsRef, {
+                    name: tagName,
+                    slug: tagName.toLowerCase().replace(/_/g, '-'),
+                    createDate: new Date().toISOString()
+                });
+                console.log(`Added Tag: ${tagName}`);
+            } else {
+                console.log(`Tag exists: ${tagName} -> SKIPPED`);
+            }
+        }
     } catch (error) {
         console.error("Error seeding data:", error);
         alert("Lỗi khi nạp dữ liệu: " + error.message);

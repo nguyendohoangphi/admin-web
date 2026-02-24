@@ -40,6 +40,10 @@
                     <span class="material-icons-round">category</span>
                     Danh mục
                 </a>
+                <a href="/tags.html" class="menu-item">
+                    <span class="material-icons-round">label</span>
+                    Tags (Nhãn)
+                </a>
                 <a href="/coupons" class="menu-item">
                     <span class="material-icons-round">card_giftcard</span>
                     Mã giảm giá
@@ -100,8 +104,9 @@
                                 <th>Tên sản phẩm</th>
                                 <th>Giá</th>
                                 <th>Danh mục</th>
+                                <th>Tags</th>
                                 <th>Đánh giá</th>
-                                <th>Hành động</th>
+                                <th style="min-width: 100px;">Hành động</th>
                             </tr>
                         </thead>
                         <tbody id="product-list">
@@ -138,6 +143,13 @@
                 <div class="form-group">
                     <label>Giá (VND)</label>
                     <input type="number" id="p-price" class="form-control" required placeholder="50000">
+                </div>
+                <div class="form-group">
+                    <label>Tags (Nhãn)</label>
+                    <div id="tags-container"
+                        style="display: flex; flex-wrap: wrap; gap: 8px; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; max-height: 120px; overflow-y: auto;">
+                        <small style="color:grey; width:100%;">Đang tải tags...</small>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>Hình ảnh</label>

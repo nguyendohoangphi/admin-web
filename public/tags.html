@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý Đơn hàng - Coffee Admin</title>
+    <title>Quản lý Tags - Admin Dashboard</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
@@ -12,7 +12,7 @@
 
 <body>
     <div class="container">
-
+        <!-- Sidebar -->
         <aside class="sidebar">
             <div class="logo-area">
                 <div class="logo-icon">
@@ -40,6 +40,10 @@
                     <span class="material-icons-round">category</span>
                     Danh mục
                 </a>
+                <a href="/tags" class="menu-item active">
+                    <span class="material-icons-round">label</span>
+                    Tags (Nhãn)
+                </a>
                 <a href="/coupons" class="menu-item">
                     <span class="material-icons-round">card_giftcard</span>
                     Mã giảm giá
@@ -48,14 +52,15 @@
                     <span class="material-icons-round">table_restaurant</span>
                     Bàn
                 </a>
-                <a href="/orders" class="menu-item active">
+                <a href="/orders" class="menu-item">
                     <span class="material-icons-round">receipt_long</span>
                     Đơn hàng
                 </a>
                 <a href="/ads" class="menu-item">
                     <span class="material-icons-round">ad_units</span>
-                    Banners (Ads)
+                    Banners
                 </a>
+
                 <div class="menu-section">HỆ THỐNG</div>
                 <a href="/devtools" class="menu-item">
                     <span class="material-icons-round">code</span>
@@ -71,10 +76,10 @@
             </nav>
         </aside>
 
-
+        <!-- Main Content -->
         <main class="main-content">
             <header class="top-header">
-                <div class="page-title">Quản lý Đơn hàng</div>
+                <div class="page-title">Quản lý Tags (Nhãn sản phẩm)</div>
                 <div class="user-profile">
                     <span class="material-icons-round">account_circle</span>
                     <span>Admin</span>
@@ -82,10 +87,16 @@
             </header>
 
             <div class="dashboard-content">
-                <div class="action-bar">
-                    <div class="search-box">
-                        <span class="material-icons-round" style="color: #A0AEC0;">search</span>
-                        <input type="text" id="searchInput" placeholder="Tìm kiếm đơn hàng...">
+                <div class="controls-bar" style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <button id="btn-add-tag" class="btn-primary" style="display: flex; align-items: center; gap: 5px;">
+                        <span class="material-icons-round">add</span>
+                        Thêm Tag Mới
+                    </button>
+                    <div style="flex-grow: 1;"></div>
+                    <div class="search-box" style="position: relative;">
+                        <span class="material-icons-round"
+                            style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #94a3b8;">search</span>
+                        <input type="text" id="search-input" placeholder="Tìm kiếm tag..." style="padding-left: 35px;">
                     </div>
                 </div>
 
@@ -93,41 +104,52 @@
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>Mã ĐH</th>
-                                <th>Khách hàng</th>
-                                <th>Tổng tiền</th>
-                                <th>Bàn</th>
-                                <th>Thời gian</th>
-                                <th>Trạng thái</th>
-                                <th>Hành động</th>
+                                <th style="width: 50px;">#</th>
+                                <th>Tên Tag</th>
+                                <th>Slug (Mã)</th>
+                                <th>Ngày tạo</th>
+                                <th style="text-align: right;">Hành động</th>
                             </tr>
                         </thead>
-                        <tbody id="order-list">
-
+                        <tbody id="tagsTableBody">
+                            <!-- Rows will be populated by JS -->
                         </tbody>
                     </table>
-                    <div id="loading" class="loading">Đang tải dữ liệu...</div>
                 </div>
             </div>
         </main>
     </div>
 
-
-    <div id="orderDetailModal" class="modal">
-        <div class="modal-content" style="max-width: 600px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2>Chi tiết đơn hàng</h2>
-                <span class="material-icons-round" style="cursor: pointer;" id="btn-close-detail">close</span>
+    <!-- Add/Edit Tag Modal -->
+    <div id="tagModal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3 id="modalTitle">Thêm Tag Mới</h3>
+                <span class="close-modal">&times;</span>
             </div>
-            <div id="order-detail-content">
+            <div class="modal-body">
+                <input type="hidden" id="tagId">
 
+                <div class="form-group">
+                    <label>Tên Tag</label>
+                    <input type="text" id="tagName" placeholder="Ví dụ: Đồ Lạnh">
+                </div>
+
+                <div class="form-group">
+                    <label>Slug (Mã)</label>
+                    <input type="text" id="tagSlug" placeholder="Ví dụ: cold">
+                    <small style="color: grey;">Dùng cho AI (không dấu, viết liền)</small>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary close-modal-btn">Hủy</button>
+                <button id="btn-save-tag" class="btn-primary">Lưu Tag</button>
             </div>
         </div>
     </div>
 
     <script type="module" src="theme.js"></script>
-    <script type="module" src="orders.js"></script>
-    <script type="module" src="script.js"></script>
+    <script type="module" src="tags.js"></script>
 </body>
 
 </html>
